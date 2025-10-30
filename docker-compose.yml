@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # 1. SERVICIO DE BASE DE DATOS (MongoDB)
+  db:
+    image: mongo:latest
+    container_name: nutritrack_db
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # 2. SERVICIO DE APLICACIÓN (Node.js API)
+  app:
+    build: . 
+    container_name: nutritrack_api
+    restart: always
+    ports:
+      - "3000:3000" 
+    environment:
+      # Conexión: 'db' es el nombre del servicio de MongoDB
+      MONGO_URI: mongodb://db:27017/NutriTrackDB 
+    depends_on:
+      - db
+
+volumes:
+  mongo_data:
