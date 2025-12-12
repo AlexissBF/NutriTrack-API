@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package nutritrack.v1;
+
+option java_multiple_files = true;
+option java_package = "com.nutritrack.v1";
+
+// ---- Common ----
+message Empty {}
+
+message IdRequest {
+  string id = 1; // ObjectId en string (hex)
+}
+
+// ---- Food ----
+message Food {
+  string id = 1;             // _id de MongoDB (ObjectId en string)
+  string userId = 2;         // id lógico del usuario (si aplica)
+  string name = 3;           // nombre del alimento
+  string mealType = 4;       // desayuno/comida/cena/snack
+  double calories = 5;       // kcal
+  double quantity = 6;       // cantidad numérica
+  string unit = 7;           // g, ml, porción, etc.
+  string date = 8;           // ISO-8601 (ej. 2025-12-11T21:30:00Z)
+  string notes = 9;          // notas opcionales
+}
+
+message CreateFoodRequest {
+  Food food = 1; // sin id
+}
+
+message FoodResponse {
+  Food food = 1;
+}
+
+message ListFoodsRequest {
+  string userId = 1;  // opcional (filtrar por usuario)
+  int32 limit = 2;    // opcional
+  int32 skip = 3;     // opcional
+}
+
+message ListFoodsResponse {
+  repeated Food foods = 1;
+}
+
+message UpdateFoodRequest {
+  string id = 1;
+  Food food = 2; // campos a reemplazar (id se ignora)
+}
+
+message DeleteResponse {
+  bool deleted = 1;
+}
+
+// ---- Activity ----
+message Activity {
+  string id = 1;
+  string userId = 2;
+  string type = 3;            // tipo de actividad (correr, gym, etc.)
+  double durationMinutes = 4; // duración
+  double caloriesBurned = 5;  // kcal quemadas
+  string date = 6;            // ISO-8601
+  string notes = 7;
+}
+
+message CreateActivityRequest {
+  Activity activity = 1;
+}
+
+message ActivityResponse {
+  Activity activity = 1;
+}
+
+message ListActivitiesRequest {
+  string userId = 1;  // opcional
+  int32 limit = 2;
+  int32 skip = 3;
+}
+
+message ListActivitiesResponse {
+  repeated Activity activities = 1;
+}
+
+message UpdateActivityRequest {
+  string id = 1;
+  Activity activity = 2; // campos a reemplazar
+}
+
+// ---- Service ----
+service NutriTrackService {
+  // Food CRUD
+  rpc CreateFood(CreateFoodRequest) returns (FoodResponse);
+  rpc GetFood(IdRequest) returns (FoodResponse);
+  rpc ListFoods(ListFoodsRequest) returns (ListFoodsResponse);
+  rpc UpdateFood(UpdateFoodRequest) returns (FoodResponse);
+  rpc DeleteFood(IdRequest) returns (DeleteResponse);
+
+  // Activity CRUD
+  rpc CreateActivity(CreateActivityRequest) returns (ActivityResponse);
+  rpc GetActivity(IdRequest) returns (ActivityResponse);
+  rpc ListActivities(ListActivitiesRequest) returns (ListActivitiesResponse);
+  rpc UpdateActivity(UpdateActivityRequest) returns (ActivityResponse);
+  rpc DeleteActivity(IdRequest) returns (DeleteResponse);
+}
